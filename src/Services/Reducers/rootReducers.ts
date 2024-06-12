@@ -4,7 +4,8 @@ import { INote } from "../../Interfaces";
 
 export interface RootState {
     noteReducer: {
-      notes: INote[];
+      notes: INote[],
+      toUpdateNote:INote
     };
   }
 

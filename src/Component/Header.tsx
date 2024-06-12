@@ -7,7 +7,7 @@ const Header: FunctionComponent = () => {
         <AppBar position='static'>
             <Toolbar>
                 <img src={logo} alt="" id="headerlogo" />
-                <Typography>Ever Notes</Typography>
+                <Typography>Make Your Own Notes</Typography>
             </Toolbar>
         </AppBar>
     )

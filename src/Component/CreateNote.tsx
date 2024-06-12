@@ -1,8 +1,9 @@
 import { Box, Button, InputBase,Typography,styled } from '@mui/material'
-import React,{FunctionComponent, useState} from 'react'
+import React,{FunctionComponent, useEffect, useState} from 'react'
 import { INote } from '../Interfaces'
-import { useDispatch } from 'react-redux'
-import { addNoteHandler } from '../Services/Actions/Action'
+import { useDispatch, useSelector } from 'react-redux'
+import { addNoteHandler, updateNoteHandler } from '../Services/Actions/Action'
+import { RootState } from '../Services/Reducers/rootReducers'
 
 const Container = styled(Box)`
     & > * {
@@ -39,11 +40,12 @@ const Error = styled(Typography)`
 const newNote:INote = {
     title: '',
     note: '',
-    color: '#fff',
+    color: '#ffffff',
   };
 
 const CreateNote:FunctionComponent = () => {
     const dispatch = useDispatch();
+    const updateNote = useSelector((state: RootState) => state.noteReducer.toUpdateNote);
     const [note,setNote]=useState<INote>(newNote)
     const [error, setError] = useState(false)
 
@@ -56,19 +58,31 @@ const CreateNote:FunctionComponent = () => {
             setError(true)
             return
         }
+        if(updateNote.title&&updateNote.note&&updateNote.color){
+          dispatch(updateNoteHandler(note))
+          setNote(newNote)
+          setError(false)
+          return
+        }
           dispatch(addNoteHandler(note))
           setNote(newNote)
           setError(false)
     }
 
+    useEffect(()=>{
+      if(updateNote.title&&updateNote.color&&updateNote.note){
+        setNote({...updateNote})
+      }
+    },[updateNote])
+
   return (
     <Container>
-        <InputBase placeholder='title' value={note.title} name="title" inputProps={{maxLength:30}} onChange={(e)=>handleInput(e)}/>
+        <InputBase placeholder='Title' value={note.title} name="title" inputProps={{maxLength:30}} onChange={(e)=>handleInput(e)}/>
         <Box component={'span'}>{note.title.length}/30</Box>
-        <InputBase placeholder='note' name="note" value={note.note} inputProps={{maxLength:80}} onChange={(e)=>handleInput(e)}/>
+        <InputBase placeholder='Note' name="note" value={note.note} inputProps={{maxLength:80}} onChange={(e)=>handleInput(e)}/>
         <Box component={'span'}>{note.note.length}/80</Box>
         <InputBase type="color" placeholder='choose color' value={note.color} name="color" onChange={(e)=>handleInput(e)}/>
-        <Button variant="outlined" onClick={createNote}>Create</Button>
+        <Button variant="outlined" onClick={createNote}>{updateNote.title?'Update':'Create'}</Button>
         {error&&!note.title&&<Error>Note Title is required</Error>}
         {error&&!note.note&&<Error>Note is required</Error>}
     </Container>
